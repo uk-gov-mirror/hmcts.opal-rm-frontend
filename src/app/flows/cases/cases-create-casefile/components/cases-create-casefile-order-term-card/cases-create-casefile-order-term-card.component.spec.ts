@@ -21,33 +21,39 @@ describe('CasesCreateCasefileOrderTermCardComponent', () => {
     fixture.componentRef.setInput('card', card);
   });
 
-  it('renders the term and initially hides creditor bank rows', () => {
+  it('renders the term with the shared creditor details initially collapsed', () => {
     fixture.detectChanges();
 
-    const toggle = fixture.nativeElement.querySelector('#order-term-7-creditor-toggle') as HTMLButtonElement;
-    const bankPanel = fixture.nativeElement.querySelector('#order-term-7-bank') as HTMLDivElement;
+    const host = fixture.nativeElement.querySelector('opal-lib-govuk-details#order-term-7-bank');
+    const details = host?.querySelector('details') as HTMLDetailsElement;
     expect(fixture.nativeElement.querySelector('h2')?.textContent.trim()).toBe('Maintenance');
     expect(fixture.nativeElement.textContent).toContain('£10.00');
-    expect(toggle.type).toBe('button');
-    expect(toggle.getAttribute('aria-controls')).toBe('order-term-7-bank');
-    expect(toggle.getAttribute('aria-expanded')).toBe('false');
-    expect(toggle.textContent.trim()).toBe('Show creditor details');
-    expect(bankPanel.hidden).toBe(true);
+    expect(details).toBeTruthy();
+    expect(details.open).toBe(false);
+    expect(details.querySelector('summary')?.textContent?.trim()).toBe('Creditor details');
+    expect(details.textContent).toContain('Synthetic creditor');
+    expect(details.textContent).toContain('001122');
   });
 
-  it('toggles creditor bank rows through native button activation', () => {
+  it('opens and closes creditor details through native summary activation', () => {
     fixture.detectChanges();
-    const toggle = fixture.nativeElement.querySelector('#order-term-7-creditor-toggle') as HTMLButtonElement;
-    const bankPanel = fixture.nativeElement.querySelector('#order-term-7-bank') as HTMLDivElement;
+    const details = fixture.nativeElement.querySelector('#order-term-7-bank details') as HTMLDetailsElement;
+    const summary = details?.querySelector('summary');
+    expect(summary).toBeTruthy();
 
-    toggle.click();
+    summary!.click();
+    expect(details.open).toBe(true);
+    expect(summary!.textContent?.trim()).toBe('Creditor details');
+
+    summary!.click();
+    expect(details.open).toBe(false);
+  });
+
+  it('omits the disclosure when the creditor has no bank rows', () => {
+    fixture.componentRef.setInput('card', { ...card, bankRows: [] });
     fixture.detectChanges();
 
-    expect(toggle.getAttribute('aria-expanded')).toBe('true');
-    expect(toggle.textContent.trim()).toBe('Hide creditor details');
-    expect(bankPanel.hidden).toBe(false);
-    expect(bankPanel.textContent).toContain('Synthetic creditor');
-    expect(bankPanel.textContent).toContain('001122');
+    expect(fixture.nativeElement.querySelector('opal-lib-govuk-details')).toBeNull();
   });
 
   it('renders no actions when none are projected', () => {

@@ -10,17 +10,7 @@
       }
     </opal-lib-govuk-summary-list>
     @if (card().bankRows.length) {
-      <button
-        type="button"
-        class="govuk-link order-term-creditor-toggle"
-        [attr.id]="id() + '-creditor-toggle'"
-        [attr.aria-expanded]="expanded()"
-        [attr.aria-controls]="bankId()"
-        (click)="toggleCreditor()"
-      >
-        {{ expanded() ? 'Hide creditor details' : 'Show creditor details' }}
-      </button>
-      <div [id]="bankId()" [hidden]="!expanded()">
+      <opal-lib-govuk-details [id]="bankId()" summaryText="Creditor details">
         <opal-lib-govuk-summary-list [summaryListId]="bankListId()">
           @for (bankRow of card().bankRows; track bankRow.id) {
             <div opal-lib-govuk-summary-list-row [summaryListId]="bankListId()" [summaryListRowId]="bankRow.id">
@@ -29,7 +19,7 @@
             </div>
           }
         </opal-lib-govuk-summary-list>
-      </div>
+      </opal-lib-govuk-details>
     }
   </ng-container>
 </opal-lib-govuk-summary-card-list>
