@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { withoutHttpRetry } from '@hmcts/opal-frontend-common/interceptors/http-retry';
 import { defer, Observable, of, shareReplay, tap } from 'rxjs';
 import type { IOpalMaintenanceApplicationReferenceDataResponse } from './interfaces/opal-maintenance-application-reference-data-response.interface';
+import type { IOpalMaintenanceCasefileSubmissionResult } from './interfaces/opal-maintenance-casefile-submission-result.interface';
 import type { IOpalMaintenanceCountryReferenceDataResponse } from './interfaces/opal-maintenance-country-reference-data-response.interface';
 import type { IOpalMaintenanceMajorCreditorParams } from './interfaces/opal-maintenance-major-creditor-params.interface';
 import type { IOpalMaintenanceMajorCreditorReferenceDataResponse } from './interfaces/opal-maintenance-major-creditor-reference-data-response.interface';
@@ -84,6 +85,11 @@ export class OpalMaintenanceService {
         : null;
       return of(detail ? { ...detail } : null);
     });
+  }
+
+  /** Temporary mock response; no backend case is created or saved. */
+  public submitCasefile(): Observable<IOpalMaintenanceCasefileSubmissionResult> {
+    return defer(() => of({ draft_casefile_id: globalThis.crypto.randomUUID() }));
   }
 
   public getCountries(active: boolean): Observable<IOpalMaintenanceCountryReferenceDataResponse> {

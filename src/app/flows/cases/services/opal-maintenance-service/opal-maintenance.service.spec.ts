@@ -64,7 +64,23 @@ describe('OpalMaintenanceService', () => {
     http = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => http.verify());
+  afterEach(() => {
+    vi.restoreAllMocks();
+    http.verify();
+  });
+
+  it('generates only when subscribed and returns distinct mock results', async () => {
+    const generate = vi.spyOn(globalThis.crypto, 'randomUUID');
+    const request = service.submitCasefile();
+    expect(generate).not.toHaveBeenCalled();
+    const first = await firstValueFrom(request);
+    const second = await firstValueFrom(service.submitCasefile());
+    expect(first.draft_casefile_id).toMatch(/\S+/);
+    expect(second.draft_casefile_id).not.toBe(first.draft_casefile_id);
+    expect(Object.keys(first)).toEqual(['draft_casefile_id']);
+    expect(generate).toHaveBeenCalledTimes(2);
+    TestBed.inject(HttpTestingController).expectNone(() => true);
+  });
 
   it('returns filtered synthetic Results without HTTP and clones each subscription', async () => {
     const request = service.getResults({ order_term: true, active: true });
